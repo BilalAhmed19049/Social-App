@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 
+import '../models/comment_model.dart';
 import '../models/post_model.dart';
 import '../models/user_data_model.dart';
 import '../utils/constants.dart';
@@ -16,7 +17,11 @@ class DataProvider with ChangeNotifier {
   UserDataModel? _userData;
 
   UserDataModel? get userData => _userData;
+  List<CommentModel>? _commentsList;
+
+  List<CommentModel>? get comments => _commentsList;
   StreamSubscription<List<UserDataModel>>? _usersSubscription;
+  StreamSubscription<List<CommentModel>>? _commentsSubscription;
   StreamSubscription<QuerySnapshot>? _postStreamSubscription;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? stream;
   final CollectionReference _userCollection = Constants.users;
@@ -30,6 +35,20 @@ class DataProvider with ChangeNotifier {
   // PostModel? _postData;
   // PostModel? get postData=>_postData;
   PostModel? post;
+
+  PostModel? _post;
+
+  PostModel? get Post => _post;
+
+  set Post(PostModel? newPost) {
+    _post = newPost;
+    if (newPost != null) {
+      _commentsSubscription = getComments(newPost.id!).listen((comments) {
+        _commentsList = comments;
+        notifyListeners();
+      });
+    }
+  }
 
   DataProvider() {
     init();
@@ -46,6 +65,13 @@ class DataProvider with ChangeNotifier {
         startPostStream(user.uid);
         _usersSubscription = getUsersStream().listen((users) {
           _usersList = users;
+          notifyListeners();
+        });
+      }
+
+      if (post != null) {
+        _commentsSubscription = getComments(post!.id!).listen((comments) {
+          _commentsList = comments;
           notifyListeners();
         });
       }
@@ -70,6 +96,16 @@ class DataProvider with ChangeNotifier {
           UserDataModel.fromMap(snapshot.data() as Map<String, dynamic>);
       notifyListeners();
     });
+  }
+
+  Stream<List<CommentModel>> getComments(String postId) {
+    return FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .snapshots()
+        .map((snap) =>
+            snap.docs.map((doc) => CommentModel.fromMap(doc.data())).toList());
   }
 
   Stream<List<UserDataModel>> getUsersStream() {
@@ -187,6 +223,18 @@ class DataProvider with ChangeNotifier {
       notifyListeners();
     });
     return posts;
+  }
+
+  Future<void> saveComment(String postId, CommentModel comment) async {
+    var ref = FirebaseFirestore.instance
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .doc();
+
+    comment.id = ref.id;
+
+    await ref.set(comment.toMap());
   }
 
   @override
