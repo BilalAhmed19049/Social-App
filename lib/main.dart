@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:social_app/providers/chat_provider.dart';
+import 'package:social_app/providers/comment_provider.dart';
 import 'package:social_app/providers/data_provider.dart';
 import 'package:social_app/providers/userauth_provider.dart';
 import 'package:social_app/screens/splash_screen.dart';
@@ -19,6 +20,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (context) => UserAuth()),
         ChangeNotifierProvider(create: (context) => DataProvider()),
         ChangeNotifierProvider(create: (context) => ChatProvider()),
+        ChangeNotifierProvider(create: (context) => CommentProvider()),
       ],
       child: MyApp(),
     ),

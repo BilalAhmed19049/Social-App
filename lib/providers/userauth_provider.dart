@@ -1,5 +1,3 @@
-// userauth_provider.dart
-
 import 'dart:async';
 import 'dart:io';
 

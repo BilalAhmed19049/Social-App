@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:social_app/screens/chat_screen.dart';
-import 'package:social_app/screens/settings_screen.dart';
-
-import '../screens/search_screen.dart';
 
 class BottomAppBarWidget extends StatelessWidget {
-  const BottomAppBarWidget({super.key});
+  final int currentIndex;
+  final Function(int) onTap;
+
+  const BottomAppBarWidget({required this.currentIndex, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -17,32 +16,22 @@ class BottomAppBarWidget extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildTabItem(Icon(Icons.home), () {}),
-          //Gap(3),
-          buildTabItem(Icon(Icons.chat_outlined), () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => ChatScreen()));
-          }),
+          buildTabItem(Icon(Icons.home), 0),
+          buildTabItem(Icon(Icons.chat_outlined), 1),
           Gap(10),
-          buildTabItem(Icon(Icons.search), () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SearchScreen()));
-          }),
-          //Gap(3),
-          buildTabItem(Icon(Icons.settings), () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SettingsScreen()));
-          }),
+          buildTabItem(Icon(Icons.search), 2),
+          buildTabItem(Icon(Icons.settings), 3),
         ],
       ),
     );
   }
 
-  Widget buildTabItem(Icon icon, final VoidCallback onPressed) {
+  Widget buildTabItem(Icon icon, int index) {
     return IconButton(
-      onPressed: onPressed,
+      onPressed: () => onTap(index),
       icon: icon,
       iconSize: 30,
+      color: currentIndex == index ? Colors.teal : Colors.black,
     );
   }
 }

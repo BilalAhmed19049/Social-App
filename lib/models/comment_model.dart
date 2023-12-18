@@ -1,25 +1,28 @@
 class CommentModel {
   String? id;
-  String? commentText;
-  late String uid;
+  String? text;
+  String? uid, postId;
 
   CommentModel({
     this.id,
-    required this.commentText,
+    required this.text,
     required this.uid,
+    required this.postId,
   });
 
   CommentModel.fromMap(Map<String, dynamic> data) {
+    text = data['text'];
     uid = data["uid"];
-    commentText = data["text"];
-    id = data["id"];
+    id = data['id'];
+    postId = data['postId'];
   }
 
   Map<String, dynamic> toMap() {
     return {
+      "text": text,
       "uid": uid,
-      "commentText": commentText,
       "id": id,
+      "postId": postId,
     };
   }
 }

@@ -1,34 +1,38 @@
-class ChatModel {
-  String? uid, name, email, image;
-  late DateTime lastActive;
-  late bool isOnline;
+class ChatUserModel {
+  late final String about, createdAt, isOnline, id, lastActive, pushToken, uid;
 
-  ChatModel({
-    required this.uid,
-    required this.name,
-    required this.email,
-    required this.image,
-    required this.lastActive,
+  ChatUserModel({
+    // required this.image,
+    required this.about,
+    // required this.name,
+    required this.createdAt,
     required this.isOnline,
+    required this.id,
+    required this.lastActive,
+    // required this.email,
+    required this.pushToken,
+    required this.uid,
   });
 
-  ChatModel.fromMap(Map<String, dynamic> data) {
-    uid = data["uid"];
-    name = data["name"];
-    email = data["email"];
-    image = data["image"];
-    lastActive = data["lastActive"].toDate();
-    isOnline = data["isOnline"] ?? false;
+  ChatUserModel.fromMap(Map<String, dynamic> data) {
+    about = data['about'];
+    createdAt = data['data'];
+    isOnline = data['isOnline'];
+    id = data['id'];
+    lastActive = data['lastActive'];
+    pushToken = data['pushToken'];
+    uid = data['uid'];
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "uid": uid,
-      "name": name,
-      "email": email,
-      "image": image,
-      "lastActive": lastActive,
-      "isOnline": isOnline,
+      'about': about,
+      'createdAt': createdAt,
+      'isOnline': isOnline,
+      'id': id,
+      'lastActive': lastActive,
+      'pushToken': pushToken,
+      'uid': uid,
     };
   }
 }
