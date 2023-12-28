@@ -61,7 +61,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     Gap(20),
 
                     Fields(), // all fields
-
                     ElevatedButtonWidget(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
@@ -164,27 +163,45 @@ class _DetailsScreenState extends State<DetailsScreen> {
     return Form(
       key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Fullname',
+              fontWeight: FontWeight.normal),
           TextFieldWidget(
             validator: HelperFunctions.generalValidation,
-            labelText: 'Username',
+            labelText: '',
             // height: 51,
             controller: nameController,
             fillColor: CColors.grey3,
             textColor: CColors.t4,
             hintText: '',
+            isObscure: false,
           ),
-          Gap(10),
+          Gap(5),
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Address',
+              fontWeight: FontWeight.normal),
           TextFieldWidget(
             validator: HelperFunctions.generalValidation,
-            labelText: 'Address',
+            labelText: '',
             // height: 51,
             controller: addressController,
             fillColor: CColors.grey3,
             textColor: CColors.t4,
             hintText: '',
+            isObscure: false,
           ),
-          Gap(10),
+          Gap(5),
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Country',
+              fontWeight: FontWeight.normal),
           TextField(
             controller: countryController,
             readOnly: true,
@@ -200,22 +217,28 @@ class _DetailsScreenState extends State<DetailsScreen> {
               ),
               fillColor: CColors.grey3,
               filled: true,
-              labelText: 'Country',
+              labelText: '',
               labelStyle: TextStyle(color: CColors.t5),
             ),
           ),
-          Gap(10),
+          Gap(5),
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Phone Number',
+              fontWeight: FontWeight.normal),
           TextFieldWidget(
             validator: HelperFunctions.generalValidation,
-            labelText: 'Phone Number',
+            labelText: '',
 
             // height: 51,
             controller: phoneNumberController,
             fillColor: CColors.grey3,
             textColor: CColors.t4,
             hintText: '',
+            isObscure: false,
           ),
-          Gap(30),
+          Gap(20),
         ],
       ),
     );

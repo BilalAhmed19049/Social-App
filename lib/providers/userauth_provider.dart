@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
+import 'package:social_app/utils/helper_functions.dart';
 
 import '../models/user_data_model.dart';
 import '../utils/constants.dart';
@@ -26,7 +27,7 @@ class UserAuth extends ChangeNotifier {
   DataProvider dataProvider = DataProvider();
 
   UserAuth() {
-    fetchUserData(); // calling fetch user data function in constructor to get all data from stream as anu object of UserAuth calls
+    fetchUserData(); // calling fetch user data function in constructor to get all data from stream as any object of UserAuth calls
     notifyListeners(); //notifying all UserAuth Consumers
   }
 
@@ -49,15 +50,18 @@ class UserAuth extends ChangeNotifier {
   }) async {
     try {
       final UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: userData.email, password: userData.password);
+          email: userData.email!, password: userData.password!);
       dataProvider.init();
       await fetchUserData();
       notifyListeners();
       return true;
     } catch (error) {
-      print('Login error is $error');
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Following error $error')));
+      String errorMessage = 'An error occurred during login.';
+      if (error is FirebaseAuthException) {
+        errorMessage = error.message ?? errorMessage;
+      }
+      print('Login error is $errorMessage');
+      HelperFunctions.showSnackBar(context, errorMessage);
       return false;
     }
   }
@@ -68,7 +72,7 @@ class UserAuth extends ChangeNotifier {
   }) async {
     try {
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: userData.email, password: userData.password);
+          email: userData.email!, password: userData.password!);
       userData.id = result.user!.uid; //saving new user id in UserDataModel
       pickedImage = null; // making the File image null as new user signup
       await _userCollection
@@ -77,9 +81,12 @@ class UserAuth extends ChangeNotifier {
       await fetchUserData(); //fetch user data
       return true;
     } catch (error) {
-      print('The error is$error');
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Following error in signup$error')));
+      String errorMessage = 'An error occurred during signUp.';
+      if (error is FirebaseAuthException) {
+        errorMessage = error.message ?? errorMessage;
+      }
+      print('Signup error is $errorMessage');
+      HelperFunctions.showSnackBar(context, errorMessage);
       return false;
     }
   }

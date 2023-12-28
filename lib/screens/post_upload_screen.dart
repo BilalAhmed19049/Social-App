@@ -63,20 +63,6 @@ class PostScreen extends StatelessWidget {
                                 fit: BoxFit.cover,
                               ),
                             ),
-                      // Positioned(
-                      //   bottom: -5,
-                      //   right: -10,
-                      //   child: IconButton(
-                      //     icon: Icon(
-                      //       size: 30,
-                      //       Icons.upload_file,
-                      //       color: CColors.red7,
-                      //     ),
-                      //     onPressed: () {
-                      //       dataProvider.pickPost();
-                      //     },
-                      //   ),
-                      // ),
                     ],
                   ),
                   TextButtonWidget(

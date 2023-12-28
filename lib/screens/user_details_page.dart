@@ -45,7 +45,7 @@ class UserDetailsPage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      dataProvider.userData!.email,
+                      dataProvider.userData!.email!,
                       style: TextStyle(
                         fontSize: 16,
                       ),

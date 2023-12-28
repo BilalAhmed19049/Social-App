@@ -94,6 +94,23 @@ class SettingsScreen extends StatelessWidget {
   Widget buttons(UserAuth userAuth, BuildContext context) {
     return Column(
       children: [
+        Gap(10),
+        DividerWidget(
+          end: 0,
+          start: 0,
+          thickness: 1,
+          height: 0,
+          color: CColors.grey8,
+        ),
+        Gap(10),
+        ElevatedButtonWidget(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (ctx) => FriendsRequestsPage()));
+            },
+            text: 'Friends',
+            buttonColor: CColors.t4),
+        Gap(10),
         DividerWidget(
           end: 0,
           start: 0,
@@ -123,22 +140,7 @@ class SettingsScreen extends StatelessWidget {
           height: 0,
           color: CColors.grey8,
         ),
-        Gap(5),
-        ElevatedButtonWidget(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (ctx) => FriendsRequestsPage()));
-            },
-            text: 'Friends',
-            buttonColor: CColors.t4),
         Gap(10),
-        DividerWidget(
-          end: 0,
-          start: 0,
-          thickness: 1,
-          height: 0,
-          color: CColors.grey8,
-        ),
       ],
     );
   }

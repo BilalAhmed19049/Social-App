@@ -10,6 +10,7 @@ import '../../models/user_data_model.dart';
 import '../../providers/userauth_provider.dart';
 import '../../utils/colors.dart';
 import '../../widgets/elevated_button_widget.dart';
+import '../../widgets/password_field_widget.dart';
 import '../../widgets/text_button_widget.dart';
 import '../../widgets/text_widget.dart';
 
@@ -37,7 +38,9 @@ class SignupScreen extends StatelessWidget {
                   bool signUpSuccessful = await userAuth.signUp(
                       userData: UserDataModel(
                           email: emailController.text,
-                          password: passwordController.text),
+                          password: passwordController.text,
+                          isOnline: false,
+                          lastActive: ''),
                       context: context);
                   SharedPreferences prefs = await SharedPreferences
                       .getInstance(); //setting bool value false as user signup
@@ -69,6 +72,7 @@ class SignupScreen extends StatelessWidget {
     return Form(
       key: _formKey,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextWidget(
             color: CColors.grey8,
@@ -77,22 +81,34 @@ class SignupScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           Gap(30),
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Email',
+              fontWeight: FontWeight.normal),
           TextFieldWidget(
             validator: HelperFunctions.emailValidation,
-            labelText: 'Email',
+            labelText: '',
             controller: emailController,
             fillColor: CColors.grey3,
             textColor: CColors.grey8,
             hintText: '',
+            isObscure: false,
           ),
           Gap(10),
-          TextFieldWidget(
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Password',
+              fontWeight: FontWeight.normal),
+          PasswordFieldWidget(
             validator: HelperFunctions.passwordValidation,
-            labelText: 'Password',
+            labelText: '',
             controller: passwordController,
             fillColor: CColors.grey3,
-            textColor: CColors.grey8,
+            textColor: CColors.t4,
             hintText: '',
+            isObscure: true,
           ),
           Gap(20),
         ],

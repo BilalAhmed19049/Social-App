@@ -1,17 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:social_app/models/user_data_model.dart';
-import 'package:social_app/providers/data_provider.dart';
-import 'package:social_app/utils/constants.dart';
+import 'package:social_app/providers/chat_provider.dart';
 import 'package:social_app/widgets/message_card.dart';
 import 'package:social_app/widgets/text_widget.dart';
 
 import '../models/message_model.dart';
 import '../utils/colors.dart';
+import '../utils/my_date_util.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
-  ChatScreen({super.key, required this.user});
+  @override
+  ChatScreen({
+    super.key,
+    required this.user,
+  });
 
   final UserDataModel user;
 
@@ -19,135 +27,126 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  DataProvider dataProvider = DataProvider();
+  void initState() {
+    super.initState();
+    Provider.of<ChatProvider>(context, listen: false)
+        .fetchMessages(widget.user);
+  }
 
-  List<MessageModel> _list = [];
+  // DataProvider dataProvider = DataProvider();
+  TextEditingController messageController = TextEditingController();
+  bool _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: CColors.t1,
-      appBar: AppBar(
-        backgroundColor: CColors.backgroundColor,
-        automaticallyImplyLeading: false,
-        flexibleSpace: _appBar(),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder(
-                  stream: dataProvider.getUsersStream(),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                      case ConnectionState.none:
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-
-                      case ConnectionState.active:
-                      //case ConnetionState.done:
-
-                      case ConnectionState.done:
-                        final _list = [];
-                        _list.clear();
-                        _list.add(MessageModel(
-                            toId: '1212',
-                            msg: 'hello!',
-                            read: '',
-                            type: '',
-                            fromId: Constants.currentID,
-                            sent: '11:00 AM'));
-                        _list.add(MessageModel(
-                            toId: Constants.currentID,
-                            msg: 'Hi! How are you',
-                            read: '',
-                            type: '',
-                            fromId: 'abcd',
-                            sent: '1:00 PM'));
-
-                        if (_list.isNotEmpty) {
-                          return ListView.builder(
-                              itemCount: _list.length,
-                              padding: EdgeInsets.only(top: 10),
-                              physics: const BouncingScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return MessageCard(message: _list[index]);
-                              });
-                        } else {
-                          return const Center(
-                            child: Text('Say Hi!👋',
-                                style: TextStyle(fontSize: 16)),
-                          );
-                        }
-                    }
-                  }),
+    return Consumer<ChatProvider>(
+      builder: (context, chatProvider, child) {
+        print(
+            'Accessed ${chatProvider.messages.length} messages'); // Print statement
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: CColors.backgroundColor,
+            automaticallyImplyLeading: false,
+            flexibleSpace: _appBar(widget.user),
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    //reverse: true,
+                    itemCount: chatProvider.messages.length,
+                    padding: EdgeInsets.only(top: 10),
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      // print(
+                      //     'Displaying message ${index + 1}'); // Print statement
+                      return MessageCard(message: chatProvider.messages[index]);
+                    },
+                  ),
+                ),
+                if (_isUploading)
+                  const Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                          child: CircularProgressIndicator(strokeWidth: 2))),
+                _chatInput(widget.user),
+              ],
             ),
-            _chatInput(),
-            // Text(widget.user.fullname!),
-            // Text(),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _appBar() {
+  Widget _appBar(UserDataModel user) {
     return Padding(
-      padding: EdgeInsets.only(top: 25),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back),
-          ),
-          ClipOval(
-            child: Image.network(
-              widget.user.url!,
-              width: 50,
-            ),
-          ),
-          Gap(10),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextWidget(
-                  color: CColors.grey8,
-                  size: 18,
-                  text: widget.user.fullname!,
-                  fontWeight: FontWeight.bold),
-              TextWidget(
-                  color: CColors.grey8,
-                  size: 14,
-                  text: 'Last seen not available',
-                  fontWeight: FontWeight.normal),
-            ],
-          ),
-        ],
-      ),
-    );
+        padding: EdgeInsets.only(top: 25),
+        child: StreamBuilder(
+            stream: ChatProvider.getUserInfo(user),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.docs;
+              final list =
+                  data?.map((e) => UserDataModel.fromMap(e.data())).toList() ??
+                      [];
+              return Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back),
+                  ),
+                  ClipOval(
+                    child: Image.network(
+                      list.isNotEmpty ? list[0].url! : widget.user.url!,
+                      width: 50,
+                    ),
+                  ),
+                  Gap(10),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextWidget(
+                          color: CColors.grey8,
+                          size: 18,
+                          text: list.isNotEmpty
+                              ? list[0].fullname!
+                              : widget.user.fullname!,
+                          fontWeight: FontWeight.bold),
+                      Text(
+                          list.isNotEmpty
+                              ? list[0].isOnline
+                                  ? 'Online'
+                                  : DateUtil.getLastActiveTime(
+                                      context: context,
+                                      lastActive: list[0].lastActive!)
+                              : DateUtil.getLastActiveTime(
+                                  context: context,
+                                  lastActive: widget.user.lastActive!),
+                          style: const TextStyle(
+                              fontSize: 13, color: Colors.black54)),
+                    ],
+                  ),
+                ],
+              );
+            }));
   }
 
-  Widget _chatInput() {
+  Widget _chatInput(UserDataModel user) {
     return Row(
       children: [
         Expanded(
           child: Card(
             child: Row(
               children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.emoji_emotions,
-                    color: CColors.t3,
-                  ),
-                ),
+                Gap(5),
                 Expanded(
                   child: TextField(
+                    controller: messageController,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
@@ -158,14 +157,35 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final ImagePicker picker = ImagePicker();
+                    final List<XFile> images =
+                        await picker.pickMultiImage(imageQuality: 70);
+                    for (var i in images) {
+                      setState(() => _isUploading = true);
+                      await ChatProvider.sendChatImage(
+                          widget.user, File(i.path));
+                      setState(() => _isUploading = false);
+                    }
+                  },
                   icon: Icon(
                     Icons.image,
                     color: CColors.t3,
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(
+                        source: ImageSource.camera, imageQuality: 30);
+                    if (image != null) {
+                      setState(() => _isUploading = true);
+
+                      await ChatProvider.sendChatImage(
+                          widget.user, File(image.path));
+                      setState(() => _isUploading = false);
+                    }
+                  },
                   icon: Icon(
                     Icons.camera_alt_rounded,
                     color: CColors.t3,
@@ -176,10 +196,16 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
         IconButton(
-            onPressed: () {},
+            onPressed: () {
+              if (messageController.text.isNotEmpty) {
+                ChatProvider.sendMessage(
+                    widget.user, messageController.text, Type.text);
+                messageController.clear();
+              }
+            },
             icon: Icon(
               Icons.send,
-              color: CColors.red7,
+              color: CColors.t5,
             ))
       ],
     );

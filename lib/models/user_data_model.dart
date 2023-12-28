@@ -1,8 +1,18 @@
 class UserDataModel {
-  late String email, password;
-  String? id, country, address, phonenumber, fullname, url;
+  String? email, password;
+  String? id,
+      country,
+      address,
+      phonenumber,
+      fullname,
+      url,
+      about,
+      createdAt,
+      pushToken;
   List<String> friends = [];
   List<String> requests = [];
+  late String lastActive;
+  late bool isOnline;
 
   UserDataModel({
     required this.email,
@@ -15,6 +25,11 @@ class UserDataModel {
     this.url,
     this.friends = const [],
     this.requests = const [],
+    this.about,
+    this.createdAt,
+    required this.isOnline,
+    required this.lastActive,
+    this.pushToken,
   });
 
   UserDataModel.fromMap(Map<String, dynamic> data) {
@@ -27,6 +42,11 @@ class UserDataModel {
     country = data['country'];
     friends = List<String>.from(data['friends'] ?? []);
     requests = List<String>.from(data['requests'] ?? []);
+    about = data['about'];
+    createdAt = data['createdAt'];
+    isOnline = data['isOnline'];
+    lastActive = data['lastActive'];
+    pushToken = data['pushToken'];
   }
 
   Map<String, dynamic> toMap() {
@@ -40,6 +60,11 @@ class UserDataModel {
       'country': country,
       'friends': friends,
       'requests': requests,
+      'about': about,
+      'createdAt': createdAt,
+      'isOnline': isOnline,
+      'lastActive': lastActive,
+      'pushToken': pushToken,
     };
   }
 }

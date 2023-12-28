@@ -19,7 +19,9 @@ class DataProvider with ChangeNotifier {
 
   StreamSubscription<List<UserDataModel>>? _usersSubscription;
   StreamSubscription<QuerySnapshot>? _postStreamSubscription;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? stream;
+  StreamSubscription<User?>? _authSubscription;
+
+  // StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? stream;
   final CollectionReference _userCollection = Constants.users;
   final CollectionReference _postCollection = Constants.posts;
 
@@ -33,8 +35,6 @@ class DataProvider with ChangeNotifier {
   DataProvider() {
     init();
   }
-
-  StreamSubscription<User?>? _authSubscription;
 
   void init() {
     _posts.clear();
@@ -72,10 +72,7 @@ class DataProvider with ChangeNotifier {
   }
 
   Stream<List<UserDataModel>> getUsersStream() {
-    return FirebaseFirestore.instance
-        .collection('users')
-        .snapshots()
-        .map((snapshot) {
+    return Constants.users.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
         return UserDataModel.fromMap(doc.data());
       }).toList();
@@ -121,9 +118,7 @@ class DataProvider with ChangeNotifier {
 
   Future<bool> savePost(PostModel post) async {
     try {
-      DocumentReference ref = await FirebaseFirestore.instance
-          .collection('posts')
-          .add(post.toMap());
+      DocumentReference ref = await Constants.posts.add(post.toMap());
       post.id = ref.id;
       await ref.update({'id': ref.id});
       return true;
@@ -162,15 +157,14 @@ class DataProvider with ChangeNotifier {
 
   Future<List<PostModel>> getPostsFromUserAndFriends(String userId) async {
     List<String> friends = await getFriends(userId);
-    friends.add(userId); // add the user himself
+    //friends.add(userId); // add the user himself
     List<PostModel> posts = [];
 
     // Cancel previous subscription, if any
     _postStreamSubscription?.cancel();
 
     // Subscribe to all posts
-    _postStreamSubscription = FirebaseFirestore.instance
-        .collection('posts')
+    _postStreamSubscription = Constants.posts
         .where('uid', whereIn: friends)
         .snapshots()
         .listen((querySnapshot) {
@@ -193,6 +187,8 @@ class DataProvider with ChangeNotifier {
     _usersSubscription?.cancel();
     _postStreamSubscription?.cancel();
     post?.likes = [];
+    _userData?.friends = [];
+    _userData?.requests = [];
     super.dispose();
   }
 }

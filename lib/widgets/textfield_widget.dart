@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../utils/colors.dart';
 
 class TextFieldWidget extends StatelessWidget {
-  const TextFieldWidget({
+   TextFieldWidget({
     super.key,
     required this.labelText,
     required this.controller,
@@ -11,6 +11,7 @@ class TextFieldWidget extends StatelessWidget {
     required this.textColor,
     required this.hintText,
     this.validator,
+    required this.isObscure,
   });
 
   final String labelText;
@@ -18,6 +19,7 @@ class TextFieldWidget extends StatelessWidget {
   final Color textColor;
   final String hintText;
   final String? Function(String?)? validator;
+  bool isObscure = false;
 
   // final double height;
   final TextEditingController controller;
@@ -28,6 +30,7 @@ class TextFieldWidget extends StatelessWidget {
       // height: height,
 
       child: TextFormField(
+        obscureText: isObscure,
         validator: validator,
         controller: controller,
         style: TextStyle(
@@ -39,14 +42,14 @@ class TextFieldWidget extends StatelessWidget {
           fillColor: fillColor,
           border: const OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(30)),
-              borderSide: BorderSide(
-                width: 2,
-              )),
-          labelText: labelText,
-          hintText: hintText,
-          labelStyle: TextStyle(color: textColor),
-          errorStyle: TextStyle(color: CColors.grey8),
-        ),
+               borderSide: BorderSide(
+                 width: 2,
+               )),
+           labelText: labelText,
+           hintText: hintText,
+           labelStyle: TextStyle(color: textColor),
+           errorStyle: TextStyle(color: CColors.grey8),
+         ),
       ),
     );
   }

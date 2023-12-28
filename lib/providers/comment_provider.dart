@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 
 import '../models/comment_model.dart';
+import '../utils/constants.dart';
 
 class CommentProvider with ChangeNotifier {
   List<CommentModel> _comments = [];
@@ -14,8 +14,7 @@ class CommentProvider with ChangeNotifier {
   void startCommentsStream(String postId) {
     //print('comment stream si working');
 
-    _commentsSubscription = FirebaseFirestore.instance
-        .collection('posts')
+    _commentsSubscription = Constants.posts
         .doc(postId)
         .collection('comments')
         .snapshots()
@@ -29,11 +28,7 @@ class CommentProvider with ChangeNotifier {
   }
 
   Future<bool> saveComment(String postId, CommentModel comment) async {
-    var ref = FirebaseFirestore.instance
-        .collection('posts')
-        .doc(postId)
-        .collection('comments')
-        .doc();
+    var ref = Constants.posts.doc(postId).collection('comments').doc();
     comment.id = ref.id;
 
     await ref.set(comment.toMap());

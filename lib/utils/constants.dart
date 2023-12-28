@@ -11,7 +11,7 @@ class Constants {
   static var posts = FirebaseFirestore.instance.collection('posts');
 
   //Firebase Auth
-  static var currentID = FirebaseAuth.instance.currentUser!.uid;
+  // static var currentID = FirebaseAuth.instance.currentUser!.uid;
 
   //images
   static const logoImage = 'assets/images/img_1.png';

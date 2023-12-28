@@ -1,7 +1,12 @@
+import 'dart:developer';
+
 import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
+import 'package:social_app/providers/chat_provider.dart';
 import 'package:social_app/providers/comment_provider.dart';
 import 'package:social_app/providers/data_provider.dart';
 import 'package:social_app/screens/all_chats_screen.dart';
@@ -35,6 +40,21 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _currentIndex);
+    ChatProvider.getSelfInfo();
+    // ChatProvider.getFirebaseMessagingToken();
+
+    SystemChannels.lifecycle.setMessageHandler((message) {
+      log('Message: $message');
+
+      if (message.toString().contains('resume')) {
+        ChatProvider.updateActiveStatus(true);
+      }
+      if (message.toString().contains('pause')) {
+        ChatProvider.updateActiveStatus(false);
+      }
+
+      return Future.value(message);
+    });
   }
 
   @override
@@ -109,8 +129,8 @@ class PostListScreen extends StatelessWidget {
                       .toList();
 
                   UserDataModel? postOwner =
-                      dataProvider.usersList.firstWhereOrNull(
-                    (user) => user.id == post.uid,
+                  dataProvider.usersList.firstWhereOrNull(
+                        (user) => user.id == post.uid,
                   );
 
                   return Card(
@@ -141,11 +161,11 @@ class PostListScreen extends StatelessWidget {
                                 (post.postImg != null)
                                     ? Image.network(post.postImg!)
                                     : Image.asset(
-                                        Constants.logoImage,
-                                        height: 110,
-                                        width: 110,
-                                        fit: BoxFit.cover,
-                                      ),
+                                  Constants.logoImage,
+                                  height: 110,
+                                  width: 110,
+                                  fit: BoxFit.cover,
+                                ),
                                 Gap(5),
                                 Row(
                                   children: [
@@ -164,13 +184,14 @@ class PostListScreen extends StatelessWidget {
                                       onPressed: () {
                                         dataProvider.likePost(
                                           post.id!,
-                                          Constants.currentID,
+                                          FirebaseAuth
+                                              .instance.currentUser!.uid,
                                         );
                                       },
                                       icon: Icon(
                                         Icons.thumb_up,
-                                        color: post.likes
-                                                .contains(Constants.currentID)
+                                        color: post.likes.contains(FirebaseAuth
+                                                .instance.currentUser!.uid)
                                             ? CColors.t5
                                             : Colors.black,
                                       ),
@@ -183,8 +204,8 @@ class PostListScreen extends StatelessWidget {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 PostDetailsPage(
-                                              post: post,
-                                            ),
+                                                  post: post,
+                                                ),
                                           ),
                                         );
                                       },

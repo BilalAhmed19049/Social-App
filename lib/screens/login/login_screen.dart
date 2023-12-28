@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:social_app/screens/main_screen.dart';
 import 'package:social_app/screens/signup/signup_screen.dart';
 import 'package:social_app/utils/helper_functions.dart';
+import 'package:social_app/widgets/password_field_widget.dart';
 import 'package:social_app/widgets/textfield_widget.dart';
 
 import '../../models/user_data_model.dart';
@@ -46,6 +47,8 @@ class LoginScreen extends StatelessWidget {
                         country: null,
                         phonenumber: null,
                         url: null,
+                        isOnline: false,
+                        lastActive: '',
                       ));
                   if (signInSuccessful) {
                     Navigator.push(
@@ -56,6 +59,9 @@ class LoginScreen extends StatelessWidget {
                     );
                   }
                 }
+
+                passwordController.clear();
+                emailController.clear();
               },
               text: 'LOGIN',
               buttonColor: CColors.t3,
@@ -72,6 +78,8 @@ class LoginScreen extends StatelessWidget {
     return Form(
       key: _formKey,
       child: Column(
+        //mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextWidget(
             color: CColors.grey8,
@@ -80,22 +88,34 @@ class LoginScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
           Gap(30),
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Email',
+              fontWeight: FontWeight.normal),
           TextFieldWidget(
             validator: HelperFunctions.emailValidation,
-            labelText: 'Email',
+            labelText: '',
             controller: emailController,
             fillColor: CColors.grey3,
             textColor: CColors.t4,
             hintText: '',
+            isObscure: false,
           ),
           Gap(10),
-          TextFieldWidget(
+          TextWidget(
+              color: CColors.grey8,
+              size: 16,
+              text: 'Password',
+              fontWeight: FontWeight.normal),
+          PasswordFieldWidget(
             validator: HelperFunctions.passwordValidation,
-            labelText: 'Password',
+            labelText: '',
             controller: passwordController,
             fillColor: CColors.grey3,
             textColor: CColors.t4,
             hintText: '',
+            isObscure: true,
           ),
           Gap(20),
         ],
@@ -111,6 +131,8 @@ class LoginScreen extends StatelessWidget {
           onPressed: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (ctx) => SignupScreen()));
+            passwordController.clear();
+            emailController.clear();
           },
           text: 'SignUp',
           color: CColors.grey8,

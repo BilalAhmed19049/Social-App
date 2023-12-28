@@ -4,15 +4,14 @@ import 'package:provider/provider.dart';
 import 'package:social_app/models/user_data_model.dart';
 
 import '../providers/data_provider.dart';
-import '../utils/constants.dart';
 
 class FriendsRequestsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(
       builder: (context, dataProvider, child) {
-        UserDataModel currentUser = dataProvider.usersList
-            .firstWhere((user) => user.id == Constants.currentID);
+        UserDataModel currentUser = dataProvider.usersList.firstWhere(
+            (user) => user.id == FirebaseAuth.instance.currentUser!.uid);
 
         return Scaffold(
           appBar: AppBar(
@@ -57,8 +56,10 @@ class FriendsRequestsPage extends StatelessWidget {
                 child: ListView.builder(
                   itemCount: currentUser.requests.length,
                   itemBuilder: (context, index) {
+                    print('Folowing are the requests ${currentUser.requests}');
                     UserDataModel requester = dataProvider.usersList.firstWhere(
                         (user) => user.id == currentUser.requests[index]);
+
                     return ListTile(
                       leading: CircleAvatar(
                         backgroundImage:

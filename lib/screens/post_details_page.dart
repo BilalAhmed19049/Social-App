@@ -53,11 +53,13 @@ class PostDetailsPage extends StatelessWidget {
                       fontWeight: FontWeight.bold),
                   _buildComments(context),
                   TextFieldWidget(
-                      labelText: 'Comment here',
-                      controller: commentController,
-                      fillColor: CColors.grey3,
-                      textColor: CColors.grey5,
-                      hintText: ''),
+                    labelText: 'Comment here',
+                    controller: commentController,
+                    fillColor: CColors.grey3,
+                    textColor: CColors.grey5,
+                    hintText: '',
+                    isObscure: false,
+                  ),
                   TextButtonWidget(
                       onPressed: () async {
                         bool commentDone = await commentProvider.saveComment(

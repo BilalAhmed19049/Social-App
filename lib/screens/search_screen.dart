@@ -13,9 +13,6 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          // actions: [],
-          ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -59,7 +56,7 @@ class SearchScreen extends StatelessWidget {
                       backgroundImage: NetworkImage(user.url!),
                     ),
                     title: Text(user.fullname!),
-                    subtitle: Text(user.email),
+                    subtitle: Text(user.email!),
                   );
                 },
               );
